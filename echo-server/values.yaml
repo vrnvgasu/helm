@@ -1,0 +1,51 @@
+# Конфигурация приложения
+config:
+  ECHO_SERVER_RESPONSE: "Hello from Helm .values!"
+
+image:
+  repository: echo-server
+  tag: "1.1"                # Новая версия приложения
+  pullPolicy: IfNotPresent
+
+# ... всё остальное без изменений
+
+# Три реплики приложения
+replicaCount: 3
+
+# Описание образа приложения, которое мы собрали на первом шаге
+image:
+  repository: echo-server
+  pullPolicy: IfNotPresent
+  tag: "1.0"
+
+# Включаем Service Account
+serviceAccount:
+  create: true
+
+# Атрибуты подов (пригодятся позже)
+podAnnotations: {}
+podLabels: {}
+
+# Настройка параметров сервиса
+service:
+  type: NodePort
+  port: 8080
+  nodePort: 30080
+
+# Выключаем Ingress
+ingress:
+  enabled: false
+
+# Healthchecks оставляем без изменений
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# Выключаем автоматическое масштабирование
+autoscaling:
+  enabled: false
