@@ -61,7 +61,14 @@ func (h EchoHandler) sign(content string) string {
 func main() {
 	hostname, _ := os.Hostname()
 	echoResponse := os.Getenv("ECHO_SERVER_RESPONSE")
-	echoResponseSignKey := os.Getenv("ECHO_SERVER_RESPONSE_SIGN_KEY")
+	// echoResponseSignKey := os.Getenv("ECHO_SERVER_RESPONSE_SIGN_KEY")
+
+	// Читаем содержимое файла и используем его в качестве echoResponseSignKey
+	key, err := os.ReadFile("/vault/secrets/echo_server_response_sign_key")
+	if err != nil {
+		panic(err)
+	}
+	echoResponseSignKey := string(key)
 
 	echoHandler := EchoHandler{
 		Hostname:        hostname,
