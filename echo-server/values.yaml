@@ -2,28 +2,16 @@
 config:
   ECHO_SERVER_RESPONSE: "Hello from Helm .values!"
 
-image:
-  repository: echo-server
-  tag: "1.1"                # Новая версия приложения
-  pullPolicy: IfNotPresent
-
 # ... всё остальное без изменений
 
 # Три реплики приложения
 replicaCount: 3
-
-# Описание образа приложения, которое мы собрали на первом шаге
-image:
-  repository: echo-server
-  pullPolicy: IfNotPresent
-  tag: "1.0"
 
 # Включаем Service Account
 serviceAccount:
   create: true
 
 # Атрибуты подов (пригодятся позже)
-podAnnotations: {}
 podLabels: {}
 
 # Настройка параметров сервиса
@@ -49,3 +37,19 @@ readinessProbe:
 # Выключаем автоматическое масштабирование
 autoscaling:
   enabled: false
+
+image:
+  repository: echo-server
+  tag: "1.2" # Обновляем версию
+# ...
+
+podAnnotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "echo-server"
+  # Указываем, какой секрет нужно прочитать
+  vault.hashicorp.com/agent-inject-secret-echo_server_response_sign_key: "secret/echo-server"
+  # Указываем содержимое файла, в который сохранится секрет
+  vault.hashicorp.com/agent-inject-template-echo_server_response_sign_key: |
+    {{- with secret "secret/echo-server" -}}
+    {{ .Data.data.echo_server_response_sign_key }}
+    {{- end }}
